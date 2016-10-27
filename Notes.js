@@ -6,7 +6,6 @@ var chalk = require('chalk')
 require("firebase/app");
 require("firebase/database");
 
-
 /*
   initialize Application
 */
@@ -57,7 +56,7 @@ program
   })
 
 /*
-
+deletenote takes in an 
 */
 program
   .command('deletenote <del>')
@@ -67,7 +66,10 @@ program
       deletenote(del);
   })
 
-//list all notes
+/*
+lists all notes from firebase
+it takes in a limit parameter which is optional
+*/
 program
   .command('listnotes [limit]')
   .option('--limit', 'limit')
@@ -77,7 +79,10 @@ program
 
   })
 
-// searchnote command
+/*
+searches for a note
+it takes in two parameters; query_string and limit
+*/
 program
    .command('searchnotes <query_string> [limit]')
    .option('-s,--search', 'Search')
@@ -90,12 +95,8 @@ program
 program.parse(process.argv)
 
 
-
-
-
-
 /*
-createnote function takes in an object containg information about a note as parameter and saves to firebase
+createnote function takes in an object containing information about a note as parameter and saves to firebase
 */
 function createNote(noteObject){
   /*
@@ -105,7 +106,7 @@ function createNote(noteObject){
     var id = 0
     if (snapshot.val() == null || snapshot.val() == undefined)
     {
-      
+
     }
     else {
      id = Object.keys(snapshot.val()).length;
@@ -130,7 +131,6 @@ function searchNotes(query, limit) {
     console.log("I got here");
     ref.orderByChild('title').equalTo(query).limitToLast(parseInt(limit)).on("value", function(snapshot){
       console.log(snapshot.val());
-
     })
   }
   else {
@@ -140,13 +140,18 @@ function searchNotes(query, limit) {
  }
 }
 
+/*
+  viewnote function takes in an ID as parameter then passes the parameter to a callback function
+*/
 function viewnote(note_id){
   ref.orderByChild('ID').equalTo(parseInt(note_id)).on('value', function(snap) {
        callback(snap.val() );
    });
-  
 }
-
+/* 
+   checks if a note's ID exits. 
+   If it exits it returns the note
+*/
 function callback(notes_id) {
   if(notes_id === null){
     console.log(chalk.red('Note does not exist'));
@@ -158,38 +163,52 @@ function callback(notes_id) {
         console.log(chalk.green('[Author] =>'+ ' ' + notes_id[key].author)),
         console.log(chalk.green('[Note Content] =>'+ ' ' + notes_id[key].note)),
         console.log(chalk.green('[Title] =>'+ ' ' + notes_id[key].title))
-
-
       }
     }
   }
 }
 
+/*
+  lists all notes from firebase
+  takes in a parameter that limits the list result
+*/
 function listnotes(limit) {
-
   if(limit > 0) {
     ref.limitToLast(parseInt(limit)).on("value", function(snapshot) {
-      console.log(snapshot.val());
+      console.log(Object.values(snapshot.val()));
     })
   }
   else{
   ref.on("value", function(snapshot) {
   console.log(snapshot.val());
   
-}, function (errorObject) {
+  }, function (errorObject) {
   console.log("The read failed: " + errorObject.code);
-});
-}
-  
+  });
+  }  
 }
 
+/*
+ deletes a node from firebase
+*/
 
 function deletenote(note_id){
-  ref.orderByChild('ID').equalTo(parseInt(note_id)).on('value', function(snap) {
-       deletes( snap.val() );
-   });
+  ref.once('value').then(function(snap) {
+     var allNote = snap.val();
+     for(var key in allNote){
+      if(allNote[key].hasOwnProperty(note_id) && allNote[key].ID === note_id){
+        db.ref('notes' + allNote[key]).remove();
+      }
+     }
+     return allNote;
+   }).then(function(allNote){
+    console.log(allNote)
+   })
+   
    
 }
+
+
 
 
 
