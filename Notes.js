@@ -14,10 +14,12 @@ firebase.initializeApp({
 
 const db = firebase.database();
 const ref = db.ref("notes");
-var count = 0;
 var data ={};
 
-//createnote command to add a new note
+/*
+  creanote adds a new note and passes the note to a createnote function,
+  which saves to firebase
+*/
 program
   .command('createnote <note> <author> <title>')
   .option('-n, --note', 'Note')
@@ -36,7 +38,10 @@ program
 
   })
 
-//viewnote command to view a note 
+/*
+  viewnote command takes in an ID and passes the ID to a viewnote function,
+  that returns the associated with the ID
+*/ 
 program
   .command('viewnote <note_id>')
   .option('-i, --note_id', 'view note')
@@ -45,7 +50,9 @@ program
      viewnote(note_id)
   })
 
-//delete command to delete a note
+/*
+
+*/
 program
   .command('deletenote <del>')
   .option('-d, --del', 'delete')
@@ -54,6 +61,7 @@ program
       deletenote(del);
   })
 
+//list all notes
 program
   .command('listnotes [limit]')
   .option('--limit', 'limit')
@@ -63,6 +71,7 @@ program
 
   })
 
+// searchnote command
 program
    .command('searchnotes <query_string> [limit]')
    .option('-s,--search', 'Search')
@@ -73,6 +82,10 @@ program
    })
 
 program.parse(process.argv)
+
+/*
+createnote function takes in an object as parameter and saves to firebase
+*/
 
 function createNote(noteObject){
    ref.once("value", function(snapshot) {
@@ -97,6 +110,9 @@ function createNote(noteObject){
    
 }
 
+/*
+  searchNotes function searches for a particular note
+*/
 function searchNotes(query, limit) {
   console.log("limlit is:" + limit);
   if(limit > 0){
