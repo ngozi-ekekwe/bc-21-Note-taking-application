@@ -6,10 +6,13 @@ var chalk = require('chalk')
 require("firebase/app");
 require("firebase/database");
 
+
+/*
+  initialize Application
+*/
 firebase.initializeApp({
    apiKey: "AIzaSyBnf_AclGwXgPrinEnaEgSDJWTJ2VcjPu4",
   databaseURL: "https://note-taking-application.firebaseio.com/"
-
 });
 
 const db = firebase.database();
@@ -17,8 +20,9 @@ const ref = db.ref("notes");
 var data ={};
 
 /*
-  creanote adds a new note and passes the note to a createnote function,
+  createnote command adds a new note and passes the note to a createnote function,
   which saves to firebase
+  creanote takes in three parameters: note, author and title. 
 */
 program
   .command('createnote <note> <author> <title>')
@@ -27,20 +31,22 @@ program
   .option('-t, --title', 'Title')
   .description('Adds a new note')
   .action(function(note, author, title, command){
-    
-    console.log(chalk.red('You just added: ' + ' ' + chalk.blue(note)));
+    /*
+      assigns the parameters to an object 
+    */
+    console.log(chalk.red('You just added: ' + ' ' + chalk.blue(note) + ' ' + "to notes"));
     data.noteContent = note;
     data.author = author;
     data.title = title;
-    //data.ID = count
+    /*
+    passes data to a createnote function
+    */
     createNote(data);
-    //exportfile(data);
-
   })
 
 /*
-  viewnote command takes in an ID and passes the ID to a viewnote function,
-  that returns the associated with the ID
+  viewnote command takes in an ID as parameter and passes the ID to a viewnote function,
+  that returns the note associated with the ID
 */ 
 program
   .command('viewnote <note_id>')
@@ -83,13 +89,19 @@ program
 
 program.parse(process.argv)
 
-/*
-createnote function takes in an object as parameter and saves to firebase
-*/
 
+
+
+
+
+/*
+createnote function takes in an object containg information about a note as parameter and saves to firebase
+*/
 function createNote(noteObject){
-   ref.once("value", function(snapshot) {
-    //console.log(snapshot.val());
+  /*
+    checks the database and returns the snapshot
+  */
+  ref.once("value", function(snapshot) {
     var id = 0
     if (snapshot.val() == null || snapshot.val() == undefined)
     {
@@ -98,16 +110,15 @@ function createNote(noteObject){
     else {
      id = Object.keys(snapshot.val()).length;
     }
-   ref.push({
-        ID: ++id,
-        note: noteObject.noteContent,
-        title: noteObject.title,
-        author: noteObject.author
-        });
-}, function (errorObject) {
+    ref.push({
+      ID: ++id,
+      note: noteObject.noteContent,
+      title: noteObject.title,
+      author: noteObject.author
+    });
+    }, function (errorObject) {
     console.log("The read failed: " + errorObject.code);
-});
-   
+  }); 
 }
 
 /*
@@ -138,15 +149,15 @@ function viewnote(note_id){
 
 function callback(notes_id) {
   if(notes_id === null){
-    console.log('note does not exist');
+    console.log(chalk.red('Note does not exist'));
   }
   else{
     for(var key in notes_id){
       if(notes_id.hasOwnProperty(key)){
-        console.log(chalk.red(notes_id[key].ID)),
-        console.log(chalk.red(notes_id[key].author)),
-        console.log(chalk.red(notes_id[key].note)),
-        console.log(chalk.red(notes_id[key].title))
+        console.log(chalk.green('[ID] =>'+ ' ' + notes_id[key].ID)),
+        console.log(chalk.green('[Author] =>'+ ' ' + notes_id[key].author)),
+        console.log(chalk.green('[Note Content] =>'+ ' ' + notes_id[key].note)),
+        console.log(chalk.green('[Title] =>'+ ' ' + notes_id[key].title))
 
 
       }
