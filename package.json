@@ -1,0 +1,34 @@
+{
+  "name": "note_app",
+  "version": "1.0.0",
+  "description": "Note taking console application",
+  "main": "Notes.js",
+  "preferGlobal": true,
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Ngizzy/bc-21-Note-taking-application.git"
+  },
+  "keywords": [
+    "note_app"
+  ],
+  "author": "Ngozi Ekekwe",
+  "license": "ISC",
+  "bin": {
+    "noteapp": "Notes.js"
+  },
+  "bugs": {
+    "url": "https://github.com/Ngizzy/bc-21-Note-taking-application/issues"
+  },
+  "homepage": "https://github.com/Ngizzy/bc-21-Note-taking-application#readme",
+  "dependencies": {
+    "chalk": "^1.1.3",
+    "clear": "0.0.1",
+    "firebase": "^3.5.2",
+    "fs": "0.0.1-security",
+    "json2csv": "^3.7.1",
+    "sqlite": "^2.2.0"
+  }
+}
