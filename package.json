@@ -28,7 +28,7 @@
     "clear": "0.0.1",
     "firebase": "^3.5.2",
     "fs": "0.0.1-security",
-    "json2csv": "^3.7.1",
-    "sqlite": "^2.2.0"
+    "json2csv": "^3.7.1"
+    
   }
 }
