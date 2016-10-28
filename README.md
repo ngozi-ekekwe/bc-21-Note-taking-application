@@ -1,4 +1,4 @@
-# NOTE TAKING APPLICATION
+# NOTE TAKING APPLICATION WITH FIREBASE
 
 ### INTRODUCTION
 Notes is a console application that has the following commands
