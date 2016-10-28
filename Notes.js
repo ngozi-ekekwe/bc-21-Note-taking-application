@@ -1,6 +1,5 @@
 #!/usr/bin/env node
 var program = require('commander');
-var json2csv = require('json2csv');
 var fs = require('fs');
 var firebase = require('firebase');
 var chalk = require('chalk')
@@ -195,7 +194,7 @@ function deletes(snap){
   }
 
   else{
-   console.log(snap.getkey());
+   ref.remove();
   }
 }
 
