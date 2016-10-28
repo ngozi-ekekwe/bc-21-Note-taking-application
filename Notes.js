@@ -1,5 +1,6 @@
 #!/usr/bin/env node
 var program = require('commander');
+var json2csv = require('json2csv');
 var fs = require('fs');
 var firebase = require('firebase');
 var chalk = require('chalk')
@@ -82,13 +83,20 @@ searches for a note
 it takes in two parameters; query_string and limit
 */
 program
-   .command('searchnotes <query_string> [limit]')
-   .option('-s,--search', 'Search')
-   .option('-l, --limit', 'Limit')
-   .description('Search notes using query string')
-   .action(function(query_string, limit){
-      searchNotes(query_string, limit);
-   })
+  .command('searchnotes <query_string> [limit]')
+  .option('-s,--search', 'Search')
+  .option('-l, --limit', 'Limit')
+  .description('Search')
+  .action(function(query_string, limit){
+    searchNotes(query_string, limit);
+  })
+
+program
+  .command('export')
+  .action(function(){
+    exportFile();
+  })
+
 
 program.parse(process.argv)
 
@@ -192,9 +200,23 @@ function deletes(snap){
   if(snap === null){
     console.log(chalk.red("Note does not exist"));
   }
-
   else{
    ref.remove();
   }
+}
+
+/*
+exports Json 
+*/
+function exportFile(){
+  var fields = ['ID', 'Author', 'Note', 'Title']
+  ref.once("value", function(snap){
+    Notes =  snap.val();
+    var csv = json2csv({data: Notes, fields:fields});
+    fs.writeFile('file.csv', csv, function(err){
+      if (err) throw err;
+      console.log('file saved');
+    })
+  }); 
 }
 
