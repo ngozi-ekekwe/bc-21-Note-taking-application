@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 var program = require('commander');
 var json2csv = require('json2csv');
 var fs = require('fs');
@@ -52,7 +53,7 @@ program
   .option('-i, --note_id', 'view note')
   .description('View a note')
   .action(function(note_id){
-     viewnote(note_id)
+     viewNote(note_id)
   })
 
 /*
@@ -63,7 +64,7 @@ program
   .option('-d, --del', 'delete')
   .description('delete note')
   .action(function(del){
-      deletenote(del);
+      deleteNote(del);
   })
 
 /*
@@ -75,10 +76,8 @@ program
   .option('--limit', 'limit')
   .description('List all notes')
   .action(function(limit){
-    listnotes(limit);
-
+    listNotes(limit);
   })
-
 /*
 searches for a note
 it takes in two parameters; query_string and limit
@@ -94,14 +93,11 @@ program
 
 program.parse(process.argv)
 
-
 /*
 createnote function takes in an object containing information about a note as parameter and saves to firebase
 */
 function createNote(noteObject){
-  /*
-    checks the database and returns the snapshot
-  */
+  //checks the database and returns the snapshot
   ref.once("value", function(snapshot) {
     var id = 0
     if (snapshot.val() == null || snapshot.val() == undefined)
@@ -126,9 +122,7 @@ function createNote(noteObject){
   searchNotes function searches for a particular note
 */
 function searchNotes(query, limit) {
-  console.log("limlit is:" + limit);
   if(limit > 0){
-    console.log("I got here");
     ref.orderByChild('title').equalTo(query).limitToLast(parseInt(limit)).on("value", function(snapshot){
       console.log(snapshot.val());
     })
@@ -143,7 +137,7 @@ function searchNotes(query, limit) {
 /*
   viewnote function takes in an ID as parameter then passes the parameter to a callback function
 */
-function viewnote(note_id){
+function viewNote(note_id){
   ref.orderByChild('ID').equalTo(parseInt(note_id)).on('value', function(snap) {
        callback(snap.val() );
    });
@@ -167,15 +161,14 @@ function callback(notes_id) {
     }
   }
 }
-
 /*
   lists all notes from firebase
   takes in a parameter that limits the list result
 */
-function listnotes(limit) {
+function listNotes(limit) {
   if(limit > 0) {
     ref.limitToLast(parseInt(limit)).on("value", function(snapshot) {
-      console.log(Object.values(snapshot.val()));
+      console.log(snapshot.val());
     })
   }
   else{
@@ -191,28 +184,18 @@ function listnotes(limit) {
 /*
  deletes a node from firebase
 */
-
-function deletenote(note_id){
-  ref.once('value').then(function(snap) {
-     var allNote = snap.val();
-     for(var key in allNote){
-      if(allNote[key].hasOwnProperty(note_id) && allNote[key].ID === note_id){
-        db.ref('notes' + allNote[key]).remove();
-      }
-     }
-     return allNote;
-   }).then(function(allNote){
-    console.log(allNote)
-   })
-   
-   
+function deleteNote(note_id){
+  ref.orderByChild('ID').equalTo(parseInt(note_id)).on('value', function(snap) {
+       deletes(snap.val());
+   });
 }
+function deletes(snap){
+  if(snap === null){
+    console.log(chalk.red("Note does not exist"));
+  }
 
-
-
-
-
-
-
-
+  else{
+   console.log(snap.getkey());
+  }
+}
 
